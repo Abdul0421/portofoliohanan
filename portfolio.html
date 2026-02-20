@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portfolio Abdul Rasyid Fadhilah Hanan - Semua karya Web Development, Graphic Design, dan Video Editing." />
+  <title>Portfolio — Hanan Portfolio</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── PAGE STYLES ── */
+    .port-hero {
+      padding: calc(var(--nav-height) + 5rem) 5% 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .port-stats {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .port-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .port-stat-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Filter */
+    .port-filter {
+      position: relative;
+      z-index: 1;
+      padding: 0 5%;
+      max-width: 1200px;
+      margin: 2rem auto;
+    }
+
+    .port-filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      padding: 5px;
+      width: fit-content;
+      flex-wrap: wrap;
+    }
+
+    .port-tab {
+      padding: 0.5rem 1.25rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-family: var(--font-body);
+      min-height: 36px;
+      transition: all 0.3s ease;
+      letter-spacing: 0.02em;
+    }
+
+    .port-tab:hover { color: var(--text-secondary); }
+
+    .port-tab.active {
+      background: var(--gradient-main);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(79,142,247,0.3);
+    }
+
+    /* Bento Grid */
+    .port-bento {
+      position: relative;
+      z-index: 1;
+      padding: 0 5%;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .port-card {
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      border: 1px solid var(--glass-border);
+      background: var(--bg-card);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94),
+                  box-shadow 0.4s ease,
+                  border-color 0.3s ease;
+    }
+
+    .port-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(79,142,247,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(79,142,247,0.1);
+    }
+
+    .port-card.size-tall { grid-row: span 2; }
+    .port-card.size-wide { grid-column: span 2; }
+    .port-card.filtered-out { display: none; }
+
+    /* Visual */
+    .port-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .port-card.size-tall .port-visual { min-height: 320px; }
+    .port-card.size-wide .port-visual { min-height: 200px; }
+
+    .port-card[data-cat="web"] .port-visual {
+      background: linear-gradient(135deg, rgba(79,142,247,0.12), rgba(34,211,238,0.06));
+    }
+    .port-card[data-cat="graphic"] .port-visual {
+      background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(244,114,182,0.06));
+    }
+    .port-card[data-cat="video"] .port-visual {
+      background: linear-gradient(135deg, rgba(244,114,182,0.12), rgba(168,85,247,0.06));
+    }
+
+    .port-visual::before {
+      content: '';
+      position: absolute;
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-blue), transparent);
+      top: -30px; right: -30px;
+      opacity: 0.12;
+      transition: transform 0.4s;
+    }
+
+    .port-visual::after {
+      content: '';
+      position: absolute;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-purple), transparent);
+      bottom: -20px; left: -20px;
+      opacity: 0.12;
+      transition: transform 0.4s;
+    }
+
+    .port-card:hover .port-visual::before { transform: scale(1.3); }
+
+    .port-emoji {
+      font-size: 4rem;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .port-card.size-wide .port-emoji { font-size: 3.5rem; }
+    .port-card:hover .port-emoji { transform: scale(1.15) translateY(-4px); }
+
+    /* Info */
+    .port-info {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .port-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 50px;
+      margin-bottom: 0.5rem;
+    }
+
+    .port-card[data-cat="web"] .port-badge {
+      background: rgba(79,142,247,0.15);
+      color: var(--accent-blue);
+      border: 1px solid rgba(79,142,247,0.2);
+    }
+    .port-card[data-cat="graphic"] .port-badge {
+      background: rgba(168,85,247,0.15);
+      color: var(--accent-purple);
+      border: 1px solid rgba(168,85,247,0.2);
+    }
+    .port-card[data-cat="video"] .port-badge {
+      background: rgba(244,114,182,0.15);
+      color: var(--accent-pink);
+      border: 1px solid rgba(244,114,182,0.2);
+    }
+
+    .port-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .port-arrow {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+
+    .port-card:hover .port-arrow {
+      background: var(--gradient-main);
+      border-color: transparent;
+      color: #fff;
+      transform: rotate(45deg);
+    }
+
+    /* ── MODAL ── */
+    .port-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,5,10,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.35s ease;
+    }
+
+    .port-modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .port-modal {
+      background: #13131f;
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      max-width: 600px;
+      width: 100%;
+      padding: 2.5rem;
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .port-modal-overlay.open .port-modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .port-modal-close {
+      position: absolute;
+      top: 1.5rem; right: 1.5rem;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--bg-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .port-modal-close:hover {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+
+    .port-modal-visual {
+      width: 80px; height: 80px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--glass-border);
+    }
+
+    .port-modal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.8rem;
+      border-radius: 50px;
+      margin-bottom: 0.75rem;
+    }
+
+    .port-modal-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .port-modal-desc {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .port-modal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .port-modal-tag {
+      padding: 0.3rem 0.75rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .port-modal-actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .port-bento { grid-template-columns: repeat(2, 1fr); }
+      .port-card.size-wide { grid-column: span 1; }
+      .port-card.size-tall { grid-row: span 1; }
+      .port-card.size-tall .port-visual { min-height: 180px; }
+    }
+
+    @media (max-width: 576px) {
+      .port-bento { grid-template-columns: 1fr; }
+      .port-card.size-wide { grid-column: span 1; }
+      .port-filter-tabs { gap: 0.3rem; }
+      .port-tab { font-size: 0.75rem; padding: 0.4rem 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <div class="loader-logo">Hanan.</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<div class="bg-gradient-orb orb-1"></div>
+<div class="bg-gradient-orb orb-2"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">Loading</a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="skills.html">Skills</a>
+    <a href="portfolio.html" class="active">Portfolio</a>
+    <a href="contact.html" class="nav-cta">Contact Me</a>
+  </div>
+  <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="about.html">About</a>
+  <a href="skills.html">Skills</a>
+  <a href="portfolio.html" class="active">Portfolio</a>
+  <a href="contact.html">Contact</a>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<div class="port-hero">
+  <div class="section-tag reveal">My Work</div>
+  <h1 class="section-title reveal delay-1">Semua <span>Karya</span> Saya</h1>
+  <p class="section-subtitle reveal delay-2">
+    Kumpulan project nyata dari berbagai bidang — Web Development, Graphic Design, dan Video Editing. Klik karya untuk melihat detail lengkap.
+  </p>
+  <div class="port-stats reveal delay-3">
+    <div class="port-stat">
+      <div class="port-stat-dot" style="background:var(--accent-blue);box-shadow:0 0 6px var(--accent-blue);"></div>
+      9 Total Project
+    </div>
+    <div class="port-stat">
+      <div class="port-stat-dot" style="background:var(--accent-purple);box-shadow:0 0 6px var(--accent-purple);"></div>
+      3 Kategori
+    </div>
+    <div class="port-stat">
+      <div class="port-stat-dot" style="background:#22c55e;box-shadow:0 0 6px #22c55e;"></div>
+      Open for Collaboration
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FILTER ═══ -->
+<div class="port-filter reveal">
+  <div class="port-filter-tabs">
+    <button class="port-tab active" data-filter="all">✦ Semua</button>
+    <button class="port-tab" data-filter="web">⚡ Web Dev</button>
+    <button class="port-tab" data-filter="graphic">🎨 Graphic</button>
+    <button class="port-tab" data-filter="video">🎬 Video</button>
+  </div>
+</div>
+
+<!-- ═══ BENTO GRID ═══ -->
+<div class="port-bento">
+
+  <!-- 1: Landing Page – TALL -->
+  <div class="port-card size-tall reveal" data-cat="web" data-index="0">
+    <div class="port-visual"><span class="port-emoji">🌐</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">⚡ Web Dev</div>
+        <div class="port-title">Landing Page Produk</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2: Poster – NORMAL -->
+  <div class="port-card reveal delay-1" data-cat="graphic" data-index="1">
+    <div class="port-visual"><span class="port-emoji">🖼️</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">🎨 Graphic</div>
+        <div class="port-title">Poster Kampanye Sosial</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3: Video Profil – NORMAL -->
+  <div class="port-card reveal delay-2" data-cat="video" data-index="2">
+    <div class="port-visual"><span class="port-emoji">🎬</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">🎬 Video</div>
+        <div class="port-title">Video Profil Organisasi</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4: E-Commerce – WIDE -->
+  <div class="port-card size-wide reveal delay-1" data-cat="web" data-index="3">
+    <div class="port-visual"><span class="port-emoji">🛒</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">⚡ Web Dev</div>
+        <div class="port-title">E-Commerce Dashboard</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5: Instagram – NORMAL -->
+  <div class="port-card reveal delay-2" data-cat="graphic" data-index="4">
+    <div class="port-visual"><span class="port-emoji">📢</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">🎨 Graphic</div>
+        <div class="port-title">Instagram Campaign</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6: Highlight Reel – TALL -->
+  <div class="port-card size-tall reveal delay-3" data-cat="video" data-index="5">
+    <div class="port-visual"><span class="port-emoji">🎞️</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">🎬 Video</div>
+        <div class="port-title">Event Highlight Reel</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7: Branding – NORMAL -->
+  <div class="port-card reveal delay-1" data-cat="graphic" data-index="6">
+    <div class="port-visual"><span class="port-emoji">🎯</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">🎨 Graphic</div>
+        <div class="port-title">Branding Identity</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8: Portfolio v1 – NORMAL -->
+  <div class="port-card reveal delay-2" data-cat="web" data-index="7">
+    <div class="port-visual"><span class="port-emoji">⚡</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">⚡ Web Dev</div>
+        <div class="port-title">Personal Portfolio v1</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9: Music Video – NORMAL -->
+  <div class="port-card reveal delay-3" data-cat="video" data-index="8">
+    <div class="port-visual"><span class="port-emoji">🎵</span></div>
+    <div class="port-info">
+      <div>
+        <div class="port-badge">🎬 Video</div>
+        <div class="port-title">Music Event Video</div>
+      </div>
+      <div class="port-arrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- END BENTO GRID -->
+
+<!-- ═══ CTA ═══ -->
+<div style="position:relative;z-index:1;padding:4rem 5%;">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="reveal" style="background:linear-gradient(135deg,rgba(79,142,247,0.08),rgba(168,85,247,0.08));border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-xl);padding:3.5rem 2rem;text-align:center;">
+      <div class="section-tag" style="justify-content:center;margin:0 auto 1rem;">Let's Collaborate</div>
+      <h2 class="section-title" style="margin-bottom:1rem;">Tertarik Bekerja Sama?</h2>
+      <p class="section-subtitle" style="margin:0 auto 2rem;">Saya siap membantu mewujudkan project kamu dari nol hingga selesai.</p>
+      <a href="contact.html" class="btn btn-primary" style="margin:0 auto;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Hubungi Saya
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL ═══ -->
+<div id="port-modal-overlay" class="port-modal-overlay" role="dialog" aria-modal="true">
+  <div class="port-modal">
+    <button class="port-modal-close" id="modal-close">✕</button>
+    <div class="port-modal-visual" id="modal-visual">🌐</div>
+    <div class="port-modal-badge" id="modal-badge">Web Dev</div>
+    <div class="port-modal-title" id="modal-title">Project Title</div>
+    <div class="port-modal-desc" id="modal-desc">Deskripsi project.</div>
+    <div class="port-modal-tags" id="modal-tags"></div>
+    <div class="port-modal-actions">
+      <a href="contact.html" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Request Similar
+      </a>
+      <button class="btn btn-outline" id="modal-close-btn">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><div class="logo">Hanan.</div><p>Web Developer · Video Editor · Graphic Designer berbasis di Purwokerto, Jawa Tengah.</p></div>
+    <div class="footer-col">
+      <h4>Navigation</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="skills.html">Skills</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:arfhhanan@gmail.com">arfhhanan@gmail.com</a></li>
+        <li><a href="https://wa.me/6285328111665">+62 853 2811 1665</a></li>
+        <li><a href="https://instagram.com/arfhnn04_">@arfhnn04_</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Abdul Rasyid Fadhilah Hanan. All rights reserved.</span>
+    <div class="footer-socials">
+      <a href="mailto:arfhhanan@gmail.com"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></a>
+      <a href="https://instagram.com/arfhnn04_"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<button class="scroll-top" aria-label="Scroll to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
+
+<script src="js/script.js" defer></script>
+<script>
+// ── DATA ──
+const portfolioData = [
+  {
+    emoji: '🌐', cat: 'web', badge: '⚡ Web Dev',
+    title: 'Landing Page Produk',
+    desc: 'Landing page modern dengan animasi scroll reveal, hero section full-screen, dan form kontak terintegrasi. Responsive di semua perangkat dengan loading time optimal.',
+    tags: ['HTML5', 'CSS3', 'JavaScript', 'Responsive', 'Animation']
+  },
+  {
+    emoji: '🖼️', cat: 'graphic', badge: '🎨 Graphic',
+    title: 'Poster Kampanye Sosial',
+    desc: 'Seri poster kampanye sosial bertema lingkungan dengan desain bold, tipografi kuat, dan palet warna earth-tone yang konsisten di seluruh materi.',
+    tags: ['Poster Design', 'Typography', 'Color Theory', 'Adobe Illustrator']
+  },
+  {
+    emoji: '🎬', cat: 'video', badge: '🎬 Video',
+    title: 'Video Profil Organisasi',
+    desc: 'Video profil mahasiswa dan organisasi kampus dengan narasi storytelling yang kuat. Meliputi motion graphics, color grading sinematik, dan scoring musik.',
+    tags: ['Video Editing', 'Color Grading', 'Motion Graphics', 'OBS Studio']
+  },
+  {
+    emoji: '🛒', cat: 'web', badge: '⚡ Web Dev',
+    title: 'E-Commerce Dashboard',
+    desc: 'Dashboard admin e-commerce lengkap dengan fitur manajemen produk, order tracking real-time, dan visualisasi data penjualan yang informatif.',
+    tags: ['HTML5', 'CSS3', 'JavaScript', 'Dashboard', 'Data Visualization']
+  },
+  {
+    emoji: '📢', cat: 'graphic', badge: '🎨 Graphic',
+    title: 'Instagram Campaign',
+    desc: 'Paket konten media sosial Instagram campaign meliputi feed posts, stories template, dan highlight covers dengan estetika brand yang kohesif.',
+    tags: ['Social Media', 'Canva', 'Brand Identity', 'Content Design']
+  },
+  {
+    emoji: '🎞️', cat: 'video', badge: '🎬 Video',
+    title: 'Event Highlight Reel',
+    desc: 'Highlight video event seminar nasional dengan dynamic editing, transisi kreatif, lower-third animasi, dan pengisian suara yang profesional.',
+    tags: ['Video Editing', 'Event Coverage', 'Lower Third', 'Sound Design']
+  },
+  {
+    emoji: '🎯', cat: 'graphic', badge: '🎨 Graphic',
+    title: 'Branding Identity',
+    desc: 'Paket identitas visual brand lengkap mencakup logo, color palette, tipografi, dan panduan penggunaan untuk startup teknologi.',
+    tags: ['Logo Design', 'Brand Guide', 'Typography', 'Color Palette']
+  },
+  {
+    emoji: '⚡', cat: 'web', badge: '⚡ Web Dev',
+    title: 'Personal Portfolio v1',
+    desc: 'Portfolio website versi pertama dengan tema minimalis, animasi CSS halus, dan performa loading yang optimal di semua perangkat.',
+    tags: ['HTML5', 'CSS3', 'Vanilla JS', 'Responsive', 'Performance']
+  },
+  {
+    emoji: '🎵', cat: 'video', badge: '🎬 Video',
+    title: 'Music Event Video',
+    desc: 'Video dokumentasi event musik dengan editing dinamis, color grading vivid yang energik, dan sinkronisasi beat yang presisi.',
+    tags: ['Video Editing', 'Color Grading', 'Beat Sync', 'Event Coverage']
+  },
+];
+
+const catStyle = {
+  web:     { bg:'rgba(79,142,247,0.15)',  color:'var(--accent-blue)',   border:'rgba(79,142,247,0.25)',  visualBg:'linear-gradient(135deg,rgba(79,142,247,0.15),rgba(34,211,238,0.08))' },
+  graphic: { bg:'rgba(168,85,247,0.15)', color:'var(--accent-purple)', border:'rgba(168,85,247,0.25)', visualBg:'linear-gradient(135deg,rgba(168,85,247,0.15),rgba(244,114,182,0.08))' },
+  video:   { bg:'rgba(244,114,182,0.15)',color:'var(--accent-pink)',   border:'rgba(244,114,182,0.25)',visualBg:'linear-gradient(135deg,rgba(244,114,182,0.15),rgba(168,85,247,0.08))' },
+};
+
+// ── FILTER ──
+document.querySelectorAll('.port-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.port-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.getAttribute('data-filter');
+    document.querySelectorAll('.port-card').forEach(card => {
+      const match = filter === 'all' || card.getAttribute('data-cat') === filter;
+      card.classList.toggle('filtered-out', !match);
+    });
+  });
+});
+
+// ── MODAL ──
+const overlay = document.getElementById('port-modal-overlay');
+
+function openModal(index) {
+  const d = portfolioData[index];
+  const s = catStyle[d.cat];
+
+  const visual = document.getElementById('modal-visual');
+  visual.textContent = d.emoji;
+  visual.style.background = s.visualBg;
+  visual.style.borderColor = s.border;
+
+  const badge = document.getElementById('modal-badge');
+  badge.textContent = d.badge;
+  badge.style.background = s.bg;
+  badge.style.color = s.color;
+  badge.style.border = `1px solid ${s.border}`;
+  badge.style.borderRadius = '50px';
+  badge.style.padding = '0.3rem 0.8rem';
+  badge.style.fontSize = '0.65rem';
+  badge.style.fontWeight = '700';
+  badge.style.letterSpacing = '0.1em';
+  badge.style.textTransform = 'uppercase';
+
+  document.getElementById('modal-title').textContent = d.title;
+  document.getElementById('modal-desc').textContent = d.desc;
+
+  const tagsEl = document.getElementById('modal-tags');
+  tagsEl.innerHTML = d.tags.map(t => `<span class="port-modal-tag">${t}</span>`).join('');
+
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.port-card').forEach(card => {
+  card.addEventListener('click', () => openModal(parseInt(card.getAttribute('data-index'))));
+});
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>
